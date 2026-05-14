@@ -5,13 +5,10 @@ from app.rag.embeddings import create_embeddings
 from app.rag.vector_store import create_vector_store
 from app.rag.retrieval import retrieve_relevant_chunks
 from app.services.llm_service import generate_answer
-
 import os
-
-
 router = APIRouter()
 
-# Global storage
+# Globla  storage. atta global vapru production chya veles use karycha nasto apan!
 global_vector_store = None
 global_chunks = None
 
@@ -31,16 +28,16 @@ async def upload_pdf(file: UploadFile = File(...)):
     with open(file_path, "wb") as pdf_file:
         pdf_file.write(await file.read())
 
-    # Extract text
+    # Extract text karun ghetla PDF madhun
     extracted_text = load_pdf(file_path)
 
-    # Create chunks
+    # Create chunks kele
     chunks = chunk_text(extracted_text)
 
-    # Generate embeddings
+    # Generate embeddings karun ghetle chunks sathi
     embeddings = create_embeddings(chunks)
 
-    # Store vector DB globally
+    # Store vector DB globally for retrieval during question answering so easy padel aplyala
     global_vector_store = create_vector_store(embeddings)
     global_chunks = chunks
 
@@ -62,14 +59,14 @@ async def ask_question(question: str):
             "error": "Please upload a PDF first"
         }
 
-    # Retrieve relevant chunks
+    # Retrieve relevant chunks , question vr adharit 
     retrieved_chunks = retrieve_relevant_chunks(
         question,
         global_vector_store,
         global_chunks
     )
 
-    # Generate AI answer
+    # Generat kru  AI answer
     answer = generate_answer(
         question,
         retrieved_chunks
